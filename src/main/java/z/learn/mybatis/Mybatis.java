@@ -31,7 +31,11 @@ public class Mybatis {
 
             userInfoDao.updateUser(2, RandomStringUtils.randomAlphabetic(8), "aabb", "bbcc");
 
-            userInfoDao.updateUser(4, RandomStringUtils.randomAlphabetic(8), null, "bbcc");
+            userInfoDao.updateUserScript(4, RandomStringUtils.randomAlphabetic(8), "abc", null);
+
+            userInfoDao.updateUserScript(5, null, null, RandomStringUtils.randomAlphabetic(8));
+
+            userInfoDao.updateUserScript(6, null, RandomStringUtils.randomAlphabetic(8), null);
 
             session.commit();
             System.out.println(ret);

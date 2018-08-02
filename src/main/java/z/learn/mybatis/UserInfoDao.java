@@ -22,9 +22,9 @@ public interface UserInfoDao {
             "<script>",
             "update user_info",
             "<set>",
-            "<if test='name != null'>name=#{name}</if>",
-            "<if test='address != null'>address=#{address}</if>",
-            "<if test='phone != null'>phone=#{phone}</if>",
+            "<if test='name != null'> name=#{name}, </if>",
+            "<if test='address != null'> address=#{address}, </if>",
+            "<if test='phone != null'> phone=#{phone} </if>",
             "</set>",
             "where id=#{id}",
             "</script>"
