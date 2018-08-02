@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.BlogMapper">
+    <select id="selectBlog" resultType="z.learn.mybatis.Blog">
+        select * from Blog where id = #{id}
+    </select>
+
+    <insert id="insertBlog" parameterType="z.learn.mybatis.Blog">
+        <selectKey keyProperty="id" order="BEFORE" resultType="integer">
+            select nextval('blog_seq')
+        </selectKey>
+        insert into Blog values(#{id},#{name})
+    </insert>
+</mapper>
