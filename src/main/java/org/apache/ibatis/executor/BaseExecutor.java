@@ -55,7 +55,7 @@ public abstract class BaseExecutor implements Executor {
     protected Executor wrapper;
 
     protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
-    protected PerpetualCache localCache;                            // 本地缓存
+    protected PerpetualCache localCache;                            // 本地缓存 本地Map实现的缓存 一级缓存
     protected PerpetualCache localOutputParameterCache;
     protected Configuration configuration;
 
@@ -113,7 +113,7 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
-        clearLocalCache();
+        clearLocalCache();                  // 更新会清除本地一级缓存
         return doUpdate(ms, parameter);
     }
 
@@ -144,7 +144,7 @@ public abstract class BaseExecutor implements Executor {
             throw new ExecutorException("Executor was closed.");
         }
         if (queryStack == 0 && ms.isFlushCacheRequired()) {
-            clearLocalCache();
+            clearLocalCache();      // 查询语句也要求每次都从数据库获取，先清空缓存
         }
         List<E> list;
         try {
@@ -196,7 +196,7 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
-        CacheKey cacheKey = new CacheKey();
+        CacheKey cacheKey = new CacheKey();     // 把本次SQL操作请求的相关信息记录到CacheKey中，生成CacheKey
         cacheKey.update(ms.getId());
         cacheKey.update(rowBounds.getOffset());
         cacheKey.update(rowBounds.getLimit());
@@ -206,7 +206,7 @@ public abstract class BaseExecutor implements Executor {
         // mimic DefaultParameterHandler logic
         for (ParameterMapping parameterMapping : parameterMappings) {
             if (parameterMapping.getMode() != ParameterMode.OUT) {
-                Object value;
+                Object value;                                           // SQL入参
                 String propertyName = parameterMapping.getProperty();
                 if (boundSql.hasAdditionalParameter(propertyName)) {
                     value = boundSql.getAdditionalParameter(propertyName);
@@ -238,7 +238,7 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Cannot commit, transaction is already closed");
         }
-        clearLocalCache();
+        clearLocalCache();              // 事务操作会清空本地缓存
         flushStatements();
         if (required) {
             transaction.commit();
@@ -319,13 +319,13 @@ public abstract class BaseExecutor implements Executor {
 
     private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
         List<E> list;
-        localCache.putObject(key, EXECUTION_PLACEHOLDER);
+        localCache.putObject(key, EXECUTION_PLACEHOLDER);   // 存入缓存 占位
         try {
-            list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+            list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);  // 做实际的DB操作查询
         } finally {
             localCache.removeObject(key);
         }
-        localCache.putObject(key, list);
+        localCache.putObject(key, list);                    // 实际将查询结果放入缓存
         if (ms.getStatementType() == StatementType.CALLABLE) {
             localOutputParameterCache.putObject(key, parameter);
         }

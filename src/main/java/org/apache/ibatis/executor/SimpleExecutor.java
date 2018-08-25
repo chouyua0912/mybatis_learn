@@ -44,9 +44,9 @@ public class SimpleExecutor extends BaseExecutor {
     public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
         Statement stmt = null;
         try {
-            Configuration configuration = ms.getConfiguration();
+            Configuration configuration = ms.getConfiguration();    // 通过Configuration工厂根据MappedStatement类型创建StatementHandler 通过xml配置的statementType来控制，默认是Prepared
             StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);   // 工厂方法创建Handler
-            stmt = prepareStatement(handler, ms.getStatementLog());
+            stmt = prepareStatement(handler, ms.getStatementLog()); // 创建JDBC原生的Statement，并设置好参数
             return handler.update(stmt);
         } finally {
             closeStatement(stmt);
@@ -58,8 +58,8 @@ public class SimpleExecutor extends BaseExecutor {
         Statement stmt = null;
         try {
             Configuration configuration = ms.getConfiguration();
-            StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
-            stmt = prepareStatement(handler, ms.getStatementLog());
+            StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);   // 初始化StatementHandler
+            stmt = prepareStatement(handler, ms.getStatementLog());     // 实例化JDBC Statement 设置参数
             return handler.<E>query(stmt, resultHandler);
         } finally {
             closeStatement(stmt);
@@ -82,8 +82,8 @@ public class SimpleExecutor extends BaseExecutor {
     private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
         Statement stmt;
         Connection connection = getConnection(statementLog);
-        stmt = handler.prepare(connection, transaction.getTimeout());       // 创建出Statement实例
-        handler.parameterize(stmt);         // 向Statement设置参数
+        stmt = handler.prepare(connection, transaction.getTimeout());   // 创建出Statement实例
+        handler.parameterize(stmt);                                     // 向Statement设置参数
         return stmt;
     }
 

@@ -73,13 +73,13 @@ public class CachingExecutor implements Executor {
     @Override
     public int update(MappedStatement ms, Object parameterObject) throws SQLException {
         flushCacheIfRequired(ms);
-        return delegate.update(ms, parameterObject);
+        return delegate.update(ms, parameterObject);            // 代理了SimpleExecutor，并增加了缓存功能
     }
 
     @Override
     public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
         BoundSql boundSql = ms.getBoundSql(parameterObject);
-        CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+        CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);        // 代理SimpleExecutor加入Cache能力，根据查询请求创建CacheKey
         return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
     }
 
@@ -92,10 +92,10 @@ public class CachingExecutor implements Executor {
     @Override
     public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
             throws SQLException {
-        Cache cache = ms.getCache();
+        Cache cache = ms.getCache();        // 如何激活Cache    二级缓存
         if (cache != null) {
             flushCacheIfRequired(ms);
-            if (ms.isUseCache() && resultHandler == null) {
+            if (ms.isUseCache() && resultHandler == null) {         // isUseCache 查询语句默认是True
                 ensureNoOutParams(ms, parameterObject, boundSql);
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) tcm.getObject(cache, key);
@@ -106,7 +106,7 @@ public class CachingExecutor implements Executor {
                 return list;
             }
         }
-        return delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+        return delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);    // SimpleExecutor执行SQL
     }
 
     @Override

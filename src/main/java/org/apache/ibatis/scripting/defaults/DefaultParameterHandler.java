@@ -33,7 +33,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
- * @author Clinton Begin
+ * @author Clinton Begin        实现参数设置
  * @author Eduardo Macarron
  */
 public class DefaultParameterHandler implements ParameterHandler {
@@ -41,7 +41,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     private final TypeHandlerRegistry typeHandlerRegistry;
 
     private final MappedStatement mappedStatement;
-    private final Object parameterObject;
+    private final Object parameterObject;               /**传入的参数对象**/
     private final BoundSql boundSql;
     private final Configuration configuration;
 

@@ -40,7 +40,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
 /**
- *
+ * SqlSession -> Executor -> StatementHandler           BaseExecutor 自带Map实现的本地缓存 By default, just local session caching is enabled that is used solely to cache data for the duration of a session. To enable a global second level of caching you simply need to add one line to your SQL Mapping file: <cache/>
  * The default implementation for {@link SqlSession}.
  * Note that this class is not Thread-Safe.
  *
@@ -49,7 +49,7 @@ import org.apache.ibatis.session.SqlSession;
 public class DefaultSqlSession implements SqlSession {
 
     private final Configuration configuration;
-    private final Executor executor;                // CachingExecutor
+    private final Executor executor;                // CachingExecutor 可以使用二级缓存，BaseExecutor 自带本地缓存
 
     private final boolean autoCommit;
     private boolean dirty;
@@ -144,7 +144,7 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
         try {
-            MappedStatement ms = configuration.getMappedStatement(statement);
+            MappedStatement ms = configuration.getMappedStatement(statement);               // 根据id获取MappedStatement
             return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -195,7 +195,7 @@ public class DefaultSqlSession implements SqlSession {
         try {
             dirty = true;
             MappedStatement ms = configuration.getMappedStatement(statement);
-            return executor.update(ms, wrapCollection(parameter));
+            return executor.update(ms, wrapCollection(parameter));                  // 通过CachingExecutor获得了执行SQL的能力
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error updating database.  Cause: " + e, e);
         } finally {
