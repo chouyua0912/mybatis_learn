@@ -150,8 +150,8 @@ public abstract class BaseExecutor implements Executor {
         try {
             queryStack++;
             list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
-            if (list != null) {
-                handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+            if (list != null) {         // 命中本地Map缓存
+                handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);  // 存储过程类输出处理
             } else {
                 list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
             }
@@ -301,7 +301,7 @@ public abstract class BaseExecutor implements Executor {
     }
 
     private void handleLocallyCachedOutputParameters(MappedStatement ms, CacheKey key, Object parameter, BoundSql boundSql) {
-        if (ms.getStatementType() == StatementType.CALLABLE) {
+        if (ms.getStatementType() == StatementType.CALLABLE) {      // Callable 存储过程处理输出
             final Object cachedParameter = localOutputParameterCache.getObject(key);
             if (cachedParameter != null && parameter != null) {
                 final MetaObject metaCachedParameter = configuration.newMetaObject(cachedParameter);
@@ -327,7 +327,7 @@ public abstract class BaseExecutor implements Executor {
         }
         localCache.putObject(key, list);                    // 实际将查询结果放入缓存
         if (ms.getStatementType() == StatementType.CALLABLE) {
-            localOutputParameterCache.putObject(key, parameter);
+            localOutputParameterCache.putObject(key, parameter);    // 存储过程的入参缓存？
         }
         return list;
     }
