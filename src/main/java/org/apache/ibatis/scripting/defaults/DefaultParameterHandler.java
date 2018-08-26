@@ -33,7 +33,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
- * @author Clinton Begin        实现参数设置
+ * @author Clinton Begin        实现参数设置      #{propertyName}，#{item.username}参数处理
  * @author Eduardo Macarron
  */
 public class DefaultParameterHandler implements ParameterHandler {
@@ -59,24 +59,24 @@ public class DefaultParameterHandler implements ParameterHandler {
     }
 
     @Override
-    public void setParameters(PreparedStatement ps) {
+    public void setParameters(PreparedStatement ps) {       // 从入参对象获取到参数值，并设置到PreparedStatement对象里面
         ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();                 // 获取到绑定参数列表
         if (parameterMappings != null) {
             for (int i = 0; i < parameterMappings.size(); i++) {
                 ParameterMapping parameterMapping = parameterMappings.get(i);
-                if (parameterMapping.getMode() != ParameterMode.OUT) {
+                if (parameterMapping.getMode() != ParameterMode.OUT) {                              // 存储过程的OUT类型变量不必处理，只处理IN，INOUT类型
                     Object value;
-                    String propertyName = parameterMapping.getProperty();
-                    if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params
+                    String propertyName = parameterMapping.getProperty();                           // 对象的属性名称？Xml配置的Sql的入参名称？
+                    if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params 处理#{item.username}，或者数组参数,foreach处理 __frch_item_0.name
                         value = boundSql.getAdditionalParameter(propertyName);
-                    } else if (parameterObject == null) {
+                    } else if (parameterObject == null) {                                           // null 参数处理
                         value = null;
                     } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
-                        value = parameterObject;
+                        value = parameterObject;                                                    // 参数是一个简单类型，或者是一个注册了typeHandler的对象类型
                     } else {
-                        MetaObject metaObject = configuration.newMetaObject(parameterObject);
-                        value = metaObject.getValue(propertyName);
+                        MetaObject metaObject = configuration.newMetaObject(parameterObject);       // 复杂对象或者Map类型，通过反射方便的取值
+                        value = metaObject.getValue(propertyName);                                  // 通过reflect获取对象的指定属性的值
                     }
                     TypeHandler typeHandler = parameterMapping.getTypeHandler();
                     JdbcType jdbcType = parameterMapping.getJdbcType();

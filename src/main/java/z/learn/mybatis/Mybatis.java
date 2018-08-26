@@ -8,6 +8,8 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 public class Mybatis {
 
@@ -28,6 +30,8 @@ public class Mybatis {
             mapperUpdateUser(session);
 
             dynamicMapperUpdateUser(session);
+
+            dynamicMapperBulkUpdateUser(session);
         }
     }
 
@@ -77,4 +81,12 @@ public class Mybatis {
         userInfoDao.updateUserScript(6, null, RandomStringUtils.randomAlphabetic(8), null);
     }
 
+    /**
+     * 动态SQL foreach语法实现
+     */
+    private static void dynamicMapperBulkUpdateUser(SqlSession session) {
+        UserInfoDao userInfoDao = session.getMapper(UserInfoDao.class);         // 通过Session的Mapper工厂动态生成
+        List<UserInfo> users = Arrays.asList(new UserInfo("abc", "hangzhou", "1234"), new UserInfo("cdf", "wuhan", "2344"));
+        userInfoDao.insertBulk(users);
+    }
 }

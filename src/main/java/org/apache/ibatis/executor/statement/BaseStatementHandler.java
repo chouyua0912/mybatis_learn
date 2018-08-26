@@ -48,7 +48,7 @@ public abstract class BaseStatementHandler implements StatementHandler {
     protected final MappedStatement mappedStatement;
     protected final RowBounds rowBounds;
 
-    protected BoundSql boundSql;
+    protected BoundSql boundSql;                        // 创建BoundSql时候完成了对script的分析
 
     protected BaseStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         this.configuration = mappedStatement.getConfiguration();
@@ -60,7 +60,7 @@ public abstract class BaseStatementHandler implements StatementHandler {
         this.objectFactory = configuration.getObjectFactory();
 
         if (boundSql == null) { // issue #435, get the key before calculating the statement
-            generateKeys(parameterObject);      // first we need to get the key 首先生成主键
+            generateKeys(parameterObject);      // first we need to get the key             首先生成主键,使用主键生成策略，KeyGenerator.processBefore
             boundSql = mappedStatement.getBoundSql(parameterObject);
         }
 

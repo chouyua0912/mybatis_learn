@@ -46,7 +46,7 @@ public class SimpleExecutor extends BaseExecutor {
         try {
             Configuration configuration = ms.getConfiguration();    // 通过Configuration工厂根据MappedStatement类型创建StatementHandler 通过xml配置的statementType来控制，默认是Prepared
             StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);   // 工厂方法创建Handler
-            stmt = prepareStatement(handler, ms.getStatementLog()); // 创建JDBC原生的Statement，并设置好参数
+            stmt = prepareStatement(handler, ms.getStatementLog()); // 创建JDBC原生的Statement，并设置好参数   主键生成策略KeyGenerator在上一步创建Handler时候已经调用了
             return handler.update(stmt);
         } finally {
             closeStatement(stmt);
