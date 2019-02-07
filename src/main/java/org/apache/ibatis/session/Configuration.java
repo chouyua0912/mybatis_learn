@@ -102,8 +102,8 @@ public class Configuration {
     protected boolean safeResultHandlerEnabled = true;
     protected boolean mapUnderscoreToCamelCase;
     protected boolean aggressiveLazyLoading;
-    protected boolean multipleResultSetsEnabled = true;
-    protected boolean useGeneratedKeys;
+    protected boolean multipleResultSetsEnabled = true;     // PostgreSQL不支持auto generate key
+    protected boolean useGeneratedKeys;         // useGeneratedKeys (insert and update only) This tells MyBatis to use the JDBC getGeneratedKeys method to retrieve keys generated internally by the database (e.g. auto increment fields in RDBMS like MySQL or SQL Server). Default: false
     protected boolean useColumnLabel = true;
     protected boolean cacheEnabled = true;
     protected boolean callSettersOnNulls;

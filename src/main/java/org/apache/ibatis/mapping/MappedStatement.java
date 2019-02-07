@@ -48,7 +48,7 @@ public final class MappedStatement {
     private boolean useCache;               // useCache 	Setting this to true will cause the results of this statement to be cached in 2nd level cache. Default: true for select statements.
     private boolean resultOrdered;
     private SqlCommandType sqlCommandType;
-    private KeyGenerator keyGenerator;
+    private KeyGenerator keyGenerator;      // useGeneratedKeys 	(insert and update only) This tells MyBatis to use the JDBC getGeneratedKeys method to retrieve keys generated internally by the database (e.g. auto increment fields in RDBMS like MySQL or SQL Server). Default: false
     private String[] keyProperties;
     private String[] keyColumns;
     private boolean hasNestedResultMaps;
@@ -71,7 +71,7 @@ public final class MappedStatement {
             mappedStatement.statementType = StatementType.PREPARED;
             mappedStatement.parameterMap = new ParameterMap.Builder(configuration, "defaultParameterMap", null, new ArrayList<ParameterMapping>()).build();
             mappedStatement.resultMaps = new ArrayList<ResultMap>();
-            mappedStatement.sqlCommandType = sqlCommandType;
+            mappedStatement.sqlCommandType = sqlCommandType;                // 默认值false  insert类型的SQL 会需要Jdbc3KeyGenerator,支持批量插入时候返回主键,但需要是autokey类型的主键
             mappedStatement.keyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType) ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
             String logId = id;
             if (configuration.getLogPrefix() != null) {

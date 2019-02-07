@@ -27,7 +27,7 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.RowBounds;
 
 /**
- * @author Clinton Begin
+ * @author Clinton Begin        执行SQL之前会先执行这个Select来获取key
  * @author Jeff Butler
  */
 public class SelectKeyGenerator implements KeyGenerator {

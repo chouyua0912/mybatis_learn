@@ -182,14 +182,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         final List<Object> multipleResults = new ArrayList<Object>();
 
         int resultSetCount = 0;
-        ResultSetWrapper rsw = getFirstResultSet(stmt);
+        ResultSetWrapper rsw = getFirstResultSet(stmt); // 从Statement获取结果集ResultSet，包装wrapper，设置meta表头信息，类型信息
 
-        List<ResultMap> resultMaps = mappedStatement.getResultMaps();
+        List<ResultMap> resultMaps = mappedStatement.getResultMaps();   // mappedStatement映射的一个sql语句，获取对应的ResultMap
         int resultMapCount = resultMaps.size();
         validateResultMapsCount(rsw, resultMapCount);
         while (rsw != null && resultMapCount > resultSetCount) {
             ResultMap resultMap = resultMaps.get(resultSetCount);
-            handleResultSet(rsw, resultMap, multipleResults, null);
+            handleResultSet(rsw, resultMap, multipleResults, null); // 处理ResultSet
             rsw = getNextResultSet(stmt);
             cleanUpAfterHandlingResultSet();
             resultSetCount++;
@@ -296,7 +296,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             } else {
                 if (resultHandler == null) {
                     DefaultResultHandler defaultResultHandler = new DefaultResultHandler(objectFactory);
-                    handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null);
+                    handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null); // 处理单行的值
                     multipleResults.add(defaultResultHandler.getResultList());
                 } else {
                     handleRowValues(rsw, resultMap, resultHandler, rowBounds, null);
@@ -587,7 +587,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         this.useConstructorMappings = false; // reset previous mapping result
         final List<Class<?>> constructorArgTypes = new ArrayList<Class<?>>();
         final List<Object> constructorArgs = new ArrayList<Object>();
-        Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
+        Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);//生成原始结果对象
         if (resultObject != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
             final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
             for (ResultMapping propertyMapping : propertyMappings) {
@@ -604,7 +604,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix)
             throws SQLException {
-        final Class<?> resultType = resultMap.getType();
+        final Class<?> resultType = resultMap.getType();//结果类型Class
         final MetaClass metaType = MetaClass.forClass(resultType, reflectorFactory);
         final List<ResultMapping> constructorMappings = resultMap.getConstructorResultMappings();
         if (hasTypeHandlerForResultObject(rsw, resultType)) {
